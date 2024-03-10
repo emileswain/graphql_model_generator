@@ -1,0 +1,21 @@
+type Author {
+    name: String!,
+}
+
+type ImageModel{
+    name: String!,
+    author: Author!,
+    title: String!,
+    url: String!,
+    tags: [String]!,
+    altText: String!,
+}
+
+type ImageCollection{
+    name: String!,
+    author: Author!,
+    altText: String!
+    tags: [String]!,
+    heroImage: ImageModel!,
+    images:[ImageModel]!
+}
