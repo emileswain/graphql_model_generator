@@ -1,3 +1,7 @@
 ## 0.0.1
 
-* TODO: Describe initial release.
+* Initial release
+* Writes flutter model classes based on graphql
+* Includes basic class writer
+* Includes example project
+* Limited unit tests
