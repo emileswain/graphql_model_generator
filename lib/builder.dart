@@ -1,4 +1,3 @@
-
 import 'package:build/build.dart';
 import 'package:graphql_model_generator/builders/gql_to_model_builder.dart';
 

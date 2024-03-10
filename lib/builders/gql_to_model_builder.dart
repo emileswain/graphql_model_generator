@@ -30,7 +30,6 @@ class TypeVisitor extends RecursiveVisitor {
 /// to write the final output.
 ///
 class GQLToModelBuilder extends Builder {
-
   /// The main entry point for build runner.
   GQLToModelBuilder();
 
@@ -69,12 +68,14 @@ class GQLToModelBuilder extends Builder {
       try {
         String typeName = gqlType.name.value;
         // Generate and write class to disk
-        BasicClassWriter interpreter = BasicClassWriter(gqlType, packageName, importPath);
+        BasicClassWriter interpreter =
+            BasicClassWriter(gqlType, packageName, importPath);
         String classBody = interpreter.writeClassFromGQLType();
         writeToFile(buildStep, typeName, classBody);
 
         // generate import directive for builder output class.
-        classImportDirectives.add(Utils.getTypeExportPathDirective(typeName, packageName, importPath));
+        classImportDirectives.add(Utils.getTypeExportPathDirective(
+            typeName, packageName, importPath));
       } catch (err) {
         developer.log(err.toString());
       }
@@ -92,19 +93,22 @@ class GQLToModelBuilder extends Builder {
       allocator: Allocator(),
       orderDirectives: true,
     );
-    await buildStep.writeAsString(copy, DartFormatter().format('${library.accept(emitter)}'));
+    await buildStep.writeAsString(
+        copy, DartFormatter().format('${library.accept(emitter)}'));
   }
 
   /// Write a file to disc.
   ///
   /// For every Type found in the graphql file we will
   /// write a respective flutter class file.
-  void writeToFile(BuildStep buildStep, String className, String classBody) async {
+  void writeToFile(
+      BuildStep buildStep, String className, String classBody) async {
     String outputSubfolder = "";
     String d = p.dirname(buildStep.inputId.path);
     String fileName = '$className.dart';
     fileName = Utils.toSnakeCase(fileName);
-    var file = await File(p.join(p.join(d, outputSubfolder), fileName)).create(recursive: true);
+    var file = await File(p.join(p.join(d, outputSubfolder), fileName))
+        .create(recursive: true);
     if (file.existsSync()) {
       file.deleteSync();
     }

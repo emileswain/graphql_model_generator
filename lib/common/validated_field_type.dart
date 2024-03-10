@@ -19,12 +19,16 @@ class ValidatedFieldType {
 
   /// Future mame of class model field
   final String name;
+
   /// Future type of class model field
   final String fieldType;
+
   /// Whether the field is a List<type>()
   final bool isList;
+
   /// Whether or not the field is a standard dart type.
   final bool isDartType;
+
   /// Whether the field is specifically a Color type.
   final bool isColorType;
 
@@ -61,7 +65,8 @@ class ValidatedFieldType {
     if (gqlField.type is NamedTypeNode) {
       fieldType = (gqlField.type as NamedTypeNode).name.value;
     } else if (gqlField.type is ListTypeNode) {
-      fieldType = ((gqlField.type as ListTypeNode).type as NamedTypeNode).name.value;
+      fieldType =
+          ((gqlField.type as ListTypeNode).type as NamedTypeNode).name.value;
       isList = true;
     } else {
       throw Exception(

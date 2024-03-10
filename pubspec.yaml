@@ -1,5 +1,5 @@
 name: graphql_model_generator
-description: "Generates nice-ish looking dart model classes from graphql"
+description: Automatically generate nice-ish looking dart model classes from graphql schema files.
 version: 0.0.2
 homepage: https://github.com/emileswain/graphql_model_generator
 
@@ -8,7 +8,7 @@ environment:
   flutter: ">=1.17.0"
 
 dependencies:
-  analyzer: '>=4.6.0 <6.0.0'
+  analyzer: ^6.4.1
   flutter:
     sdk: flutter
   build: ^2.0.0

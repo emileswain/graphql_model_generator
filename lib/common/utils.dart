@@ -22,13 +22,16 @@ class Utils {
   /// MyClassName -> my_class_name
   static String toSnakeCase(String input) {
     RegExp exp = RegExp(r'(?<=[a-z])[A-Z]+');
-    String result = input.replaceAllMapped(exp, (Match m) => ('_${m.group(0) ?? ""}')).toLowerCase();
+    String result = input
+        .replaceAllMapped(exp, (Match m) => ('_${m.group(0) ?? ""}'))
+        .toLowerCase();
     return result;
   }
 
   /// Capitalise a word.
   ///
-  static String capitalise(String s) => (s.length > 1) ? s[0].toUpperCase() + s.substring(1) : s.toUpperCase();
+  static String capitalise(String s) =>
+      (s.length > 1) ? s[0].toUpperCase() + s.substring(1) : s.toUpperCase();
 
   /// Convert the build runners packagePath into an import path.
   ///
@@ -46,7 +49,8 @@ class Utils {
     String importPath = packagePath;
     importPath = importPath.replaceFirst("lib/", "");
     String typeClassPath = Utils.toSnakeCase(typeClassName);
-    return Directive.import('package:$packageName/$importPath/$typeClassPath.dart');
+    return Directive.import(
+        'package:$packageName/$importPath/$typeClassPath.dart');
   }
 
   /// Convert the build runners packagePath into an export path.
@@ -55,7 +59,8 @@ class Utils {
     String importPath = packagePath;
     importPath = importPath.replaceFirst("lib/", "");
     String typeClassPath = Utils.toSnakeCase(typeClassName);
-    return Directive.export('package:$packageName/$importPath/$typeClassPath.dart');
+    return Directive.export(
+        'package:$packageName/$importPath/$typeClassPath.dart');
   }
 
   /// Convert between graphql schema types and dart types.

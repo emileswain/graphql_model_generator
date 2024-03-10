@@ -199,7 +199,7 @@ class BasicClassWriter {
       ..methods.add(copyWithMethod));
 
     /// Format and write the class to string using DartFormatter
-    /// 
+    ///
     /// Ensuring to wrap in a code_builder Library() to support imports
     final emitter = DartEmitter(
       allocator: Allocator(),
@@ -212,7 +212,7 @@ class BasicClassWriter {
 
     return DartFormatter().format('${library.accept(emitter)}');
   }
-  
+
   /// Create fromJson Constructor factory method.
   ///
   /// Graphql example
@@ -253,7 +253,7 @@ class BasicClassWriter {
     StringBuffer sb = StringBuffer();
 
     // Write the parsing json array blocks
-    validatedFields.forEach((ValidatedFieldType validatedFieldType) {
+    for (var validatedFieldType in validatedFields) {
       if (validatedFieldType.isList) {
         var capped = Utils.capitalise(validatedFieldType.name);
         sb.writeln("List<${validatedFieldType.fieldType}> new$capped = [];");
@@ -270,18 +270,18 @@ class BasicClassWriter {
         sb.writeln("}");
         sb.writeln("}");
       }
-    });
+    }
 
     // Write Return statement.
     sb.write("return $className(");
-    validatedFields.forEach((ValidatedFieldType validatedFieldType) {
+    for (var validatedFieldType in validatedFields) {
       if (validatedFieldType.isList) {
         var capped = Utils.capitalise(validatedFieldType.name);
         sb.write(" ${validatedFieldType.name}: new$capped ,");
       } else {
         sb.write(" ${validatedFieldType.name}: json['${validatedFieldType.name}'] ,");
       }
-    });
+    }
     sb.write(");");
 
     Constructor fromJsonConstructor = Constructor((c) => c
@@ -290,7 +290,7 @@ class BasicClassWriter {
       ..requiredParameters = ListBuilder({
         Parameter((p) => p
           ..name = 'json'
-          ..type = Reference("Map<String, dynamic>"))
+          ..type = const Reference("Map<String, dynamic>"))
       })
       // ..body = const Code("return ImageModel(name: json['name'],title: json['title'],url: json['url'],);"));
       ..body = Code(sb.toString()));
@@ -326,7 +326,7 @@ class BasicClassWriter {
   Method generateToJsonMethod(List<ValidatedFieldType> validatedFields) {
     StringBuffer sb = StringBuffer();
     sb.writeln("{");
-    validatedFields.forEach((ValidatedFieldType validatedFieldType) {
+    for (var validatedFieldType in validatedFields) {
       // working with none lists.
       if (!validatedFieldType.isList) {
         if (validatedFieldType.isDartType) {
@@ -343,14 +343,14 @@ class BasicClassWriter {
               '"${validatedFieldType.name}" : ${validatedFieldType.name}.map((item) => item.toJson()).toList(),');
         }
       }
-    });
+    }
     sb.writeln("}");
 
     // toJson Method
     Method toJsonMethod = Method((m) => m
       ..name = "toJson"
       ..lambda = true
-      ..returns = Reference("Map<String, dynamic>")
+      ..returns = const Reference("Map<String, dynamic>")
       ..body = Code(sb.toString()));
 
     return toJsonMethod;
@@ -396,20 +396,20 @@ class BasicClassWriter {
     StringBuffer sb = StringBuffer();
 
     sb.writeln("return $className(");
-    validatedFields.forEach((ValidatedFieldType validatedFieldType) {
+    for (var validatedFieldType in validatedFields) {
       sb.writeln("${validatedFieldType.name} : ${validatedFieldType.name} ?? this.${validatedFieldType.name}, ");
       var fieldType = validatedFieldType.fieldType;
       if (validatedFieldType.isList) {
-        fieldType = "List<${fieldType}>";
+        fieldType = "List<$fieldType>";
       }
       // Save an additional loop, also do parameters
       methodParameters.add(Parameter((p) => p
         ..name = validatedFieldType.name
-        ..type = Reference("${fieldType}?")
+        ..type = Reference("$fieldType?")
         ..required = false
         ..toThis = false
         ..named = true));
-    });
+    }
     sb.writeln(");");
 
     // toJson Method
