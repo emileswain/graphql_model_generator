@@ -1,0 +1,8 @@
+# Read about `build.yaml` at https://pub.dev/packages/build_config
+builders:
+  basic_builder:
+    import: 'package:graphql_model_generator/builder.dart'
+    builder_factories: [ 'graphqlModelBuilder' ]
+    build_extensions: { '.graphql': [ '.graphql.dart' ] }
+    auto_apply: none
+    build_to: source
