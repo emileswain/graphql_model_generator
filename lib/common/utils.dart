@@ -8,6 +8,9 @@ import 'package:code_builder/code_builder.dart';
 /// outputted code.
 class Utils {
   /// Convert between graphql schema types and dart types.
+  ///
+  /// @param type Type as string to test.
+  /// @returns Whether type is a dart type or not.
   static bool isDartType(String type) {
     try {
       return ["String", "int", "double", "bool", "Color"].contains(type);
@@ -18,6 +21,9 @@ class Utils {
 
   /// Convert capital case words (i.e. class names) into snake case.
   /// MyClassName -> my_class_name
+  ///
+  /// @param input String to convert into snake_case
+  /// @returns input string formatted as snake_case
   static String toSnakeCase(String input) {
     RegExp exp = RegExp(r'(?<=[a-z])[A-Z]+');
     String result = input
@@ -27,6 +33,9 @@ class Utils {
   }
 
   /// Capitalise a word.
+  ///
+  /// @param s String to capitalise
+  /// @returns Capitalised string.
   static String capitalise(String s) =>
       (s.length > 1) ? s[0].toUpperCase() + s.substring(1) : s.toUpperCase();
 
@@ -41,6 +50,11 @@ class Utils {
   /// import 'package:your_app_package/data/models/image_model.dart';
   /// ```
   /// TODO make more robust by using path to join directories. it's Fragile.
+  ///
+  /// @param typeClassName Name of class
+  /// @param packageName Project package
+  /// @param packagePath Path of class within package
+  /// @returns Fully qualified import Directive.
   static Directive getTypeImportPathDirective(
       String typeClassName, String packageName, String packagePath) {
     String importPath = packagePath;
@@ -51,6 +65,11 @@ class Utils {
   }
 
   /// Convert the build runners packagePath into an export path.
+  ///
+  /// @param typeClassName Name of class
+  /// @param packageName Project package
+  /// @param packagePath Path of class within package
+  /// @returns Fully qualified export Directive.
   static Directive getTypeExportPathDirective(
       String typeClassName, String packageName, String packagePath) {
     String importPath = packagePath;
@@ -61,6 +80,8 @@ class Utils {
   }
 
   /// Convert between graphql schema types and dart types.
+  ///
+  /// @param type Graphql Type to convert to Dart Type.
   static String gqlTypeToDartType(String type) {
     switch (type) {
       case "Int":

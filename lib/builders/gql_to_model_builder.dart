@@ -17,6 +17,8 @@ class TypeVisitor extends RecursiveVisitor {
   Iterable<ObjectTypeDefinitionNode> types = [];
 
   /// Recursive func to parse Nodes.
+  ///
+  /// @param node Graphql node definition
   @override
   visitObjectTypeDefinitionNode(
     ObjectTypeDefinitionNode node,
@@ -36,6 +38,8 @@ class GQLToModelBuilder extends Builder {
   GQLToModelBuilder();
 
   /// Process the BuildStep, reading and parsing the file contents with ast and writing model classes to disk.
+  ///
+  /// @param buildStep Current file information from Build Runner
   @override
   FutureOr<void> build(BuildStep buildStep) async {
     // cleanPreviousModelFiles(buildStep);
@@ -104,6 +108,10 @@ class GQLToModelBuilder extends Builder {
   ///
   /// For every Type found in the graphql file we will
   /// write a respective flutter class file.
+  ///
+  /// @param buildStep Current BuildStep
+  /// @param className Name of the Class being written
+  /// @param classBody Contents to write to file.
   void writeToFile(
       BuildStep buildStep, String className, String classBody) async {
     String outputSubfolder = "";
@@ -161,6 +169,8 @@ class GQLToModelBuilder extends Builder {
   /// For every *.graphql file found in the targeted builder folders we'll
   /// generate a *.graphql.dart file.
   /// This file will import all of the generated model classes.
+  ///
+  /// @returns buildExtension mappings.
   @override
   Map<String, List<String>> get buildExtensions => {
         r'.graphql': ['.graphql.dart'],

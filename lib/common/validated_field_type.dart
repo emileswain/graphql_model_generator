@@ -84,7 +84,6 @@ class ValidatedFieldType {
     }
 
     /// done
-    ///
     return ValidatedFieldType(
         name: fieldName,
         fieldType: fieldType,

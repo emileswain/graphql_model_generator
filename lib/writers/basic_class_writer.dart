@@ -112,12 +112,17 @@ class BasicClassWriter {
   String packagePath;
 
   /// Outputs a basic flutter model class given the gqlType data.
+  ///
+  /// @param gqlType Graphql ast Type information
+  /// @param packageName Project package name
+  /// @param packagePath Package path
   BasicClassWriter(this.gqlType, this.packageName, this.packagePath);
 
   /// Generate the Model class with
   /// * +fromJson()
   /// * +toJson()
   /// * +copyWith()
+  /// @returns Class body as a string.
   String writeClassFromGQLType() {
     // print(" Generating model for (gqlType.name) :  ${gqlType.name.value}");
 
@@ -253,6 +258,10 @@ class BasicClassWriter {
   ///     );
   ///   }
   /// ```
+  ///
+  /// @param className Name of class
+  /// @param validatedFields List of class fields
+  /// @returns Constructor instance describing factory fromJson() method.
   Constructor generateFromJsonConstructor(
       String className, List<ValidatedFieldType> validatedFields) {
     // fromJson Factory method code
@@ -332,6 +341,9 @@ class BasicClassWriter {
   ///         "images": images.map((item) => item.toJson()).toList(),
   ///       };
   /// ```
+  ///
+  /// @param validatedFields List of class fields
+  /// @returns Method instance describing toJson() method.
   Method generateToJsonMethod(List<ValidatedFieldType> validatedFields) {
     StringBuffer sb = StringBuffer();
     sb.writeln("{");
@@ -402,6 +414,9 @@ class BasicClassWriter {
   ///   );
   /// }
   /// ```
+  /// @param className Name of class
+  /// @param validatedFields List of class fields
+  /// @returns Method instance describing copyWith() method.
   Method generateCopyWithMethod(
       String className, List<ValidatedFieldType> validatedFields) {
     ListBuilder<Parameter> methodParameters = ListBuilder<Parameter>();

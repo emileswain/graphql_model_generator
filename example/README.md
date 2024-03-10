@@ -21,9 +21,8 @@ targets:
     builders:
       graphql_model_generator|basic_builder:
         # Only run this builder on the specified input.
-        # be specific, generated files are put in the same parent folder.
         generate_for:
-          - lib/data/models/*.graphql
+          - lib/models/*.graphql
 ```
 
 ### running builder
