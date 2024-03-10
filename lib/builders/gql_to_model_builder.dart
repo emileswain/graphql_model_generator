@@ -13,8 +13,10 @@ import 'dart:developer' as developer;
 
 /// ast TypeVisitor. Used to read graphql types.
 class TypeVisitor extends RecursiveVisitor {
+  /// TypeVisitor types to process
   Iterable<ObjectTypeDefinitionNode> types = [];
 
+  /// Recursive func to parse Nodes.
   @override
   visitObjectTypeDefinitionNode(
     ObjectTypeDefinitionNode node,
@@ -33,6 +35,7 @@ class GQLToModelBuilder extends Builder {
   /// The main entry point for build runner.
   GQLToModelBuilder();
 
+  /// Process the BuildStep, reading and parsing the file contents with ast and writing model classes to disk.
   @override
   FutureOr<void> build(BuildStep buildStep) async {
     // cleanPreviousModelFiles(buildStep);

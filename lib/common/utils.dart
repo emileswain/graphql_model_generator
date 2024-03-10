@@ -7,9 +7,7 @@ import 'package:code_builder/code_builder.dart';
 /// to the various fields and internal vars defined in the
 /// outputted code.
 class Utils {
-  ///
   /// Convert between graphql schema types and dart types.
-  ///
   static bool isDartType(String type) {
     try {
       return ["String", "int", "double", "bool", "Color"].contains(type);
@@ -29,7 +27,6 @@ class Utils {
   }
 
   /// Capitalise a word.
-  ///
   static String capitalise(String s) =>
       (s.length > 1) ? s[0].toUpperCase() + s.substring(1) : s.toUpperCase();
 
@@ -64,7 +61,6 @@ class Utils {
   }
 
   /// Convert between graphql schema types and dart types.
-  ///
   static String gqlTypeToDartType(String type) {
     switch (type) {
       case "Int":

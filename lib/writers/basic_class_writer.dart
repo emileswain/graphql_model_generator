@@ -99,7 +99,8 @@ import 'package:graphql_model_generator/common/validated_field_type.dart';
 /// ```
 class BasicClassWriter {
   /// import for supporting Color type.
-  static String colourTypeImportDirective = 'import "package:flutter/material.dart";';
+  static String colourTypeImportDirective =
+      'import "package:flutter/material.dart";';
 
   /// graphql data received from ast
   ObjectTypeDefinitionNode gqlType;
@@ -123,9 +124,11 @@ class BasicClassWriter {
     String className = gqlType.name.value;
     ListBuilder<Directive> classImportDirectives = ListBuilder<Directive>();
     ListBuilder<Field> classFields = ListBuilder<Field>();
-    ListBuilder<Parameter> classConstructorOptionalParameters = ListBuilder<Parameter>();
+    ListBuilder<Parameter> classConstructorOptionalParameters =
+        ListBuilder<Parameter>();
 
-    List<ValidatedFieldType> validatedFields = List<ValidatedFieldType>.empty(growable: true);
+    List<ValidatedFieldType> validatedFields =
+        List<ValidatedFieldType>.empty(growable: true);
 
     /// Pre-process gqlType field data.
     ///
@@ -136,14 +139,15 @@ class BasicClassWriter {
     /// We also use this loop to define the imports, classConstructorOptionalParameters and classFields
     for (var gqlField in gqlType.fields) {
       /// Pre-process type information
-      ValidatedFieldType validatedFieldType = ValidatedFieldType.parseGqlField(gqlField);
+      ValidatedFieldType validatedFieldType =
+          ValidatedFieldType.parseGqlField(gqlField);
 
       /// Add import directives
       // Set the import directives for the class field types that require imports.
       // i.e. import 'package:your_app_package/data/models/author.dart';
       if (!validatedFieldType.isDartType) {
-        classImportDirectives
-            .add(Utils.getTypeImportPathDirective(validatedFieldType.fieldType, packageName, packagePath));
+        classImportDirectives.add(Utils.getTypeImportPathDirective(
+            validatedFieldType.fieldType, packageName, packagePath));
       }
       if (validatedFieldType.isColorType) {
         classImportDirectives.add(Directive.import(colourTypeImportDirective));
@@ -178,7 +182,8 @@ class BasicClassWriter {
     Constructor classConstructor = Constructor(
       (c) => c..optionalParameters = classConstructorOptionalParameters,
     );
-    Constructor fromJsonConstructor = generateFromJsonConstructor(className, validatedFields);
+    Constructor fromJsonConstructor =
+        generateFromJsonConstructor(className, validatedFields);
     classConstructors.add(classConstructor);
     classConstructors.add(fromJsonConstructor);
 
@@ -248,7 +253,8 @@ class BasicClassWriter {
   ///     );
   ///   }
   /// ```
-  Constructor generateFromJsonConstructor(String className, List<ValidatedFieldType> validatedFields) {
+  Constructor generateFromJsonConstructor(
+      String className, List<ValidatedFieldType> validatedFields) {
     // fromJson Factory method code
     StringBuffer sb = StringBuffer();
 
@@ -257,11 +263,13 @@ class BasicClassWriter {
       if (validatedFieldType.isList) {
         var capped = Utils.capitalise(validatedFieldType.name);
         sb.writeln("List<${validatedFieldType.fieldType}> new$capped = [];");
-        sb.writeln("final json$capped = List<dynamic>.from(json['${validatedFieldType.name}']).toList();");
+        sb.writeln(
+            "final json$capped = List<dynamic>.from(json['${validatedFieldType.name}']).toList();");
 
         sb.writeln("for (var itemData in json$capped) {");
         if (!validatedFieldType.isDartType) {
-          sb.writeln("final item = ${validatedFieldType.fieldType}.fromJson(itemData);");
+          sb.writeln(
+              "final item = ${validatedFieldType.fieldType}.fromJson(itemData);");
         } else {
           sb.writeln("final item = itemData;");
         }
@@ -279,7 +287,8 @@ class BasicClassWriter {
         var capped = Utils.capitalise(validatedFieldType.name);
         sb.write(" ${validatedFieldType.name}: new$capped ,");
       } else {
-        sb.write(" ${validatedFieldType.name}: json['${validatedFieldType.name}'] ,");
+        sb.write(
+            " ${validatedFieldType.name}: json['${validatedFieldType.name}'] ,");
       }
     }
     sb.write(");");
@@ -330,14 +339,17 @@ class BasicClassWriter {
       // working with none lists.
       if (!validatedFieldType.isList) {
         if (validatedFieldType.isDartType) {
-          sb.writeln('"${validatedFieldType.name}" : ${validatedFieldType.name},');
+          sb.writeln(
+              '"${validatedFieldType.name}" : ${validatedFieldType.name},');
         } else {
-          sb.writeln('"${validatedFieldType.name}" : ${validatedFieldType.name}.toJson(),');
+          sb.writeln(
+              '"${validatedFieldType.name}" : ${validatedFieldType.name}.toJson(),');
         }
       } else {
         // working with Lists
         if (validatedFieldType.isDartType) {
-          sb.writeln('"${validatedFieldType.name}" : ${validatedFieldType.name}.map((item) => item).toList(),');
+          sb.writeln(
+              '"${validatedFieldType.name}" : ${validatedFieldType.name}.map((item) => item).toList(),');
         } else {
           sb.writeln(
               '"${validatedFieldType.name}" : ${validatedFieldType.name}.map((item) => item.toJson()).toList(),');
@@ -390,14 +402,16 @@ class BasicClassWriter {
   ///   );
   /// }
   /// ```
-  Method generateCopyWithMethod(String className, List<ValidatedFieldType> validatedFields) {
+  Method generateCopyWithMethod(
+      String className, List<ValidatedFieldType> validatedFields) {
     ListBuilder<Parameter> methodParameters = ListBuilder<Parameter>();
 
     StringBuffer sb = StringBuffer();
 
     sb.writeln("return $className(");
     for (var validatedFieldType in validatedFields) {
-      sb.writeln("${validatedFieldType.name} : ${validatedFieldType.name} ?? this.${validatedFieldType.name}, ");
+      sb.writeln(
+          "${validatedFieldType.name} : ${validatedFieldType.name} ?? this.${validatedFieldType.name}, ");
       var fieldType = validatedFieldType.fieldType;
       if (validatedFieldType.isList) {
         fieldType = "List<$fieldType>";
