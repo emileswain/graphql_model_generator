@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:graphql_model_generator/interpreter/utils.dart';
+import 'package:graphql_model_generator/common/utils.dart';
 
 void main() {
   test('utils.capitalise() capitalises.', () {
@@ -26,7 +26,7 @@ void main() {
     String goal = "package:your_app_package/data/models/image_model.dart";
     expect( Utils.getTypeImportPathDirective("imageModel","your_app_package",source).url, goal);
   });
-  test('utils.getTypeImportPathDirective()', () {
+  test('utils.getTypeExportPathDirective()', () {
     String source = "lib/data/models";
     String goal = "package:your_app_package/data/models/image_model.dart";
     expect( Utils.getTypeExportPathDirective("imageModel","your_app_package",source).url, goal);

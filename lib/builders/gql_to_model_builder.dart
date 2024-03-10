@@ -1,14 +1,15 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:build/build.dart';
+import 'package:built_collection/built_collection.dart';
 import 'package:code_builder/code_builder.dart';
 import 'package:dart_style/dart_style.dart';
 import 'package:gql/ast.dart';
-import 'package:graphql_model_generator/interpreter/basic_class_writer.dart';
-import 'package:graphql_model_generator/interpreter/utils.dart';
+import 'package:graphql_model_generator/writers/basic_class_writer.dart';
+import 'package:graphql_model_generator/common/utils.dart';
 import 'package:path/path.dart' as p;
 import "package:gql/language.dart" as lang;
-import 'package:built_collection/src/list.dart';
+import 'dart:developer' as developer;
 
 class TypeVisitor extends RecursiveVisitor {
   Iterable<ObjectTypeDefinitionNode> types = [];
@@ -23,7 +24,7 @@ class TypeVisitor extends RecursiveVisitor {
 }
 
 class GQLToModelBuilder extends Builder {
-  GQLToModelBuilder() {}
+  GQLToModelBuilder();
 
   @override
   FutureOr<void> build(BuildStep buildStep) async {
@@ -33,10 +34,10 @@ class GQLToModelBuilder extends Builder {
     var packageName = buildStep.inputId.package;
     var importPath = p.dirname(buildStep.inputId.path);
     ListBuilder<Directive> classImportDirectives = ListBuilder<Directive>();
-    print("Processing buildStep $inputId");
-    // print(" buildStep.inputId.package :  $packageName");
-    // print(" buildStep.inputId.path :  ${buildStep.inputId.path}");
-    // print(" importPath :  ${importPath}");
+    // developer.log("Processing buildStep $inputId");
+    // developer.log(" buildStep.inputId.package :  $packageName");
+    // developer.log(" buildStep.inputId.path :  ${buildStep.inputId.path}");
+    // developer.log(" importPath :  ${importPath}");
 
     /// /////////////////////////////////////////////////////////
     ///  Read file data & Implement ast graphql document read and loop through graphql types.
@@ -58,7 +59,7 @@ class GQLToModelBuilder extends Builder {
     /// /////////////////////////////////////////////////////////
     /// Loop through each type, write the class using code_builder and then save to folder
     /// relative to graph file.
-    v.types.forEach((gqlType) {
+    for (var gqlType in v.types) {
       try {
         String typeName = gqlType.name.value;
         // Generate and write class to disk
@@ -69,9 +70,9 @@ class GQLToModelBuilder extends Builder {
         // generate import directive for builder output class.
         classImportDirectives.add(Utils.getTypeExportPathDirective(typeName, packageName, importPath));
       } catch (err) {
-        print(err.toString());
+        developer.log(err.toString());
       }
-    });
+    }
 
     /// /////////////////////////////////////////////////////////
     /// write generic import class matching the input file.
@@ -97,7 +98,7 @@ class GQLToModelBuilder extends Builder {
   void writeToFile(BuildStep buildStep, String className, String classBody) async {
     String outputSubfolder = "";
     String d = p.dirname(buildStep.inputId.path);
-    String fileName = '${className}.dart';
+    String fileName = '$className.dart';
     fileName = Utils.toSnakeCase(fileName);
     var file = await File(p.join(p.join(d, outputSubfolder), fileName)).create(recursive: true);
     if (file.existsSync()) {
@@ -129,19 +130,21 @@ class GQLToModelBuilder extends Builder {
   /// read the export definitions, and then remove the files listed.
   ///
   /// TODO (emileswain): (FIX) Seems like the models.graphql.dart file is deleted by builder before I can read it.
-  void cleanPreviousModelFiles(BuildStep buildStep) {
-    String d = buildStep.inputId.path;
-    String filePostFix = ".dart";
-    String filePath = "$d$filePostFix";
-    filePath = p.absolute(filePath);
-    var file = File(filePath);
-    print("file: = " + filePath);
-    if (file.existsSync()) {
-      print("file exists");
-      List<String> lines = file.readAsLinesSync();
-      lines.forEach((e) => print(e));
-    }
-  }
+  // void cleanPreviousModelFiles(BuildStep buildStep) {
+  //   String d = buildStep.inputId.path;
+  //   String filePostFix = ".dart";
+  //   String filePath = "$d$filePostFix";
+  //   filePath = p.absolute(filePath);
+  //   var file = File(filePath);
+  //  // print("file: = " + filePath);
+  //   if (file.existsSync()) {
+  //     //print("file exists");
+  //     List<String> lines = file.readAsLinesSync();
+  //     // for (var e in lines) {
+  //     //   print(e);
+  //     // }
+  //   }
+  // }
 
   /// For every *.graphql file found in the targeted builder folders we'll
   /// generate a *.graphql.dart file.

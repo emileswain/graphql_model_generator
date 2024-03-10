@@ -1,5 +1,5 @@
 import 'package:gql/ast.dart';
-import 'package:graphql_model_generator/interpreter/utils.dart';
+import 'package:graphql_model_generator/common/utils.dart';
 
 /// Given the FieldDefinitionNode from ast for the GraphQL type,
 /// determine various properties that will be used to write the class model

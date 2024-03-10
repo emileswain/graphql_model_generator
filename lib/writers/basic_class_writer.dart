@@ -2,8 +2,8 @@ import 'package:built_collection/built_collection.dart';
 import 'package:code_builder/code_builder.dart';
 import 'package:dart_style/dart_style.dart';
 import 'package:gql/ast.dart';
-import 'package:graphql_model_generator/interpreter/utils.dart';
-import 'package:graphql_model_generator/interpreter/validated_field_type.dart';
+import 'package:graphql_model_generator/common/utils.dart';
+import 'package:graphql_model_generator/common/validated_field_type.dart';
 
 /// Generates custom dart class given the graphQL type data.
 ///
@@ -126,7 +126,7 @@ class BasicClassWriter {
     /// These values are then used to customise the properties of the code_builders class definition
     /// methods and final output.
     /// We also use this loop to define the imports, classConstructorOptionalParameters and classFields
-    gqlType.fields.forEach((FieldDefinitionNode gqlField) {
+    for (var gqlField in gqlType.fields) {
       /// /////////////////////////////////////////////////////////
       /// Pre-process type information
       /// /////////////////////////////////////////////////////////
@@ -169,7 +169,7 @@ class BasicClassWriter {
       /// Store validatedFields for use in generating child methods.
       /// /////////////////////////////////////////////////////////
       validatedFields.add(validatedFieldType);
-    });
+    }
 
     /// /////////////////////////////////////////////////////////
     /// Build Class constructor and Factory methods.
