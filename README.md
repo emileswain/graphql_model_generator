@@ -161,12 +161,20 @@ It's probably pretty handy for prototyping, initial setups and very basic apps. 
 # Resources
 Uses https://github.com/dart-lang/code_builder to define and write the classes and uses https://pub.dev/packages/gql to parse the graphql.
 
+* https://tsinis.medium.com/things-you-should-know-before-publishing-a-package-on-pub-dev-95ab195e216d
+* 
 
 #Publishing
-Note, that i'm not sure pana . runs on local file system and for some reason only runs on git repo.
-```
-pana .
-```
+
 ```
 dart doc
+```
+
+```
+dart format .
+```
+
+Note, that I'm not sure pana . runs on local file system and for some reason only runs on latest commit in git repo.
+```
+pana .
 ```

@@ -1,3 +1,7 @@
+## 0.0.3
+
+* Various formatting updates as per pana feedback.
+
 ## 0.0.2
 
 * dart docs added
