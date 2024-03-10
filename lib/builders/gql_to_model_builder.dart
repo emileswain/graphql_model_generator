@@ -11,6 +11,7 @@ import 'package:path/path.dart' as p;
 import "package:gql/language.dart" as lang;
 import 'dart:developer' as developer;
 
+/// ast TypeVisitor. Used to read graphql types.
 class TypeVisitor extends RecursiveVisitor {
   Iterable<ObjectTypeDefinitionNode> types = [];
 
@@ -23,7 +24,14 @@ class TypeVisitor extends RecursiveVisitor {
   }
 }
 
+/// The main builder class to manage reading of the files detected by build runner for processing
+///
+/// Reads the contents of the graphql file, parses them using ast and passes the information to [BasicClassWriter]
+/// to write the final output.
+///
 class GQLToModelBuilder extends Builder {
+
+  /// The main entry point for build runner.
   GQLToModelBuilder();
 
   @override
@@ -39,7 +47,6 @@ class GQLToModelBuilder extends Builder {
     // developer.log(" buildStep.inputId.path :  ${buildStep.inputId.path}");
     // developer.log(" importPath :  ${importPath}");
 
-    ///
     ///  Read file data & Implement ast graphql document read and loop through graphql types.
     ///
     ///  For each type we'll want to generate a dart model class and save it to disk.
@@ -54,7 +61,6 @@ class GQLToModelBuilder extends Builder {
     final TypeVisitor v = TypeVisitor();
     doc.accept(v);
 
-    ///
     /// Write new class model for every GQL type
     ///
     /// Loop through each type, write the class using code_builder and then save to folder
@@ -74,7 +80,6 @@ class GQLToModelBuilder extends Builder {
       }
     }
 
-    ///
     /// write generic import class matching the input file.
     ///
     /// For example a lib/data/model/models.graphql file will be detected by the builder and generate
@@ -90,7 +95,6 @@ class GQLToModelBuilder extends Builder {
     await buildStep.writeAsString(copy, DartFormatter().format('${library.accept(emitter)}'));
   }
 
-  ///
   /// Write a file to disc.
   ///
   /// For every Type found in the graphql file we will
@@ -107,8 +111,7 @@ class GQLToModelBuilder extends Builder {
     file.writeAsString(classBody, mode: FileMode.write);
   }
 
-  ///
-  /// clean previously written class model files.
+  /// Clean previously written class model files.
   ///
   /// A builder typically creates files that relate directly
   /// to the file the build is attempting to process. for example
@@ -146,6 +149,8 @@ class GQLToModelBuilder extends Builder {
   //   }
   // }
 
+  /// The extensions to process during execution of the build runner.
+  ///
   /// For every *.graphql file found in the targeted builder folders we'll
   /// generate a *.graphql.dart file.
   /// This file will import all of the generated model classes.
