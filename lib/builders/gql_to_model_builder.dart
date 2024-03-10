@@ -39,9 +39,9 @@ class GQLToModelBuilder extends Builder {
     // developer.log(" buildStep.inputId.path :  ${buildStep.inputId.path}");
     // developer.log(" importPath :  ${importPath}");
 
-    /// /////////////////////////////////////////////////////////
+    ///
     ///  Read file data & Implement ast graphql document read and loop through graphql types.
-    /// /////////////////////////////////////////////////////////
+    ///
     ///  For each type we'll want to generate a dart model class and save it to disk.
     ///  Note that we are writing many files to disk and not just one file.
     ///  As such we'll need to  perform some file clean up first, manually.
@@ -54,9 +54,9 @@ class GQLToModelBuilder extends Builder {
     final TypeVisitor v = TypeVisitor();
     doc.accept(v);
 
-    /// /////////////////////////////////////////////////////////
+    ///
     /// Write new class model for every GQL type
-    /// /////////////////////////////////////////////////////////
+    ///
     /// Loop through each type, write the class using code_builder and then save to folder
     /// relative to graph file.
     for (var gqlType in v.types) {
@@ -74,9 +74,9 @@ class GQLToModelBuilder extends Builder {
       }
     }
 
-    /// /////////////////////////////////////////////////////////
+    ///
     /// write generic import class matching the input file.
-    /// /////////////////////////////////////////////////////////
+    ///
     /// For example a lib/data/model/models.graphql file will be detected by the builder and generate
     /// a lib/data/models.graphql.dart file which will include all of the imports for the generated
     /// model classes.
@@ -90,9 +90,9 @@ class GQLToModelBuilder extends Builder {
     await buildStep.writeAsString(copy, DartFormatter().format('${library.accept(emitter)}'));
   }
 
-  /// /////////////////////////////////////////////////////////
+  ///
   /// Write a file to disc.
-  /// /////////////////////////////////////////////////////////
+  ///
   /// For every Type found in the graphql file we will
   /// write a respective flutter class file.
   void writeToFile(BuildStep buildStep, String className, String classBody) async {
@@ -107,9 +107,9 @@ class GQLToModelBuilder extends Builder {
     file.writeAsString(classBody, mode: FileMode.write);
   }
 
-  /// /////////////////////////////////////////////////////////
+  ///
   /// clean previously written class model files.
-  /// /////////////////////////////////////////////////////////
+  ///
   /// A builder typically creates files that relate directly
   /// to the file the build is attempting to process. for example
   /// a g.part file.

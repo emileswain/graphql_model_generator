@@ -12,7 +12,8 @@ import 'package:graphql_model_generator/common/validated_field_type.dart';
 ///
 /// Very basic starter classes.
 ///
-/// graphql
+/// Graphql example
+/// ```graphql
 /// type ImageModel{
 ///     name: String!,
 ///     author: Author!,
@@ -21,8 +22,10 @@ import 'package:graphql_model_generator/common/validated_field_type.dart';
 ///     tags: [String]!,
 ///     altText: String!,
 /// }
+/// ```
 ///
 /// Output Class.
+/// ```dart
 /// import 'package:your_app_package/data/models/author.dart';
 ///
 /// class ImageModel {
@@ -93,21 +96,27 @@ import 'package:graphql_model_generator/common/validated_field_type.dart';
 ///     );
 ///   }
 /// }
-///
+/// ```
 class BasicClassWriter {
+  /// import for supporting Color type.
   static String colourTypeImportDirective = 'import "package:flutter/material.dart";';
+
+  /// graphql data received from ast
   ObjectTypeDefinitionNode gqlType;
+
+  /// the package name for importing dependencies & this file.
   String packageName;
+
+  /// the package path for importing dependencies & this file.
   String packagePath;
 
+  /// Outputs a basic flutter model class given the gqlType data.
   BasicClassWriter(this.gqlType, this.packageName, this.packagePath);
 
-  /// /////////////////////////////////////////////////////////
   /// Generate the Model class with
-  /// +fromJson()
-  /// +toJson()
-  /// +copyWith()
-  /// /////////////////////////////////////////////////////////
+  /// * +fromJson()
+  /// * +toJson()
+  /// * +copyWith()
   String writeClassFromGQLType() {
     // print(" Generating model for (gqlType.name) :  ${gqlType.name.value}");
 
@@ -118,46 +127,38 @@ class BasicClassWriter {
 
     List<ValidatedFieldType> validatedFields = List<ValidatedFieldType>.empty(growable: true);
 
-    /// /////////////////////////////////////////////////////////
     /// Pre-process gqlType field data.
-    /// /////////////////////////////////////////////////////////
+    ///
     /// Read the type fields using the ValidatedFieldType.parseGqlField() to pre-determine certain
     /// properties of the field, for example valid field name, if its a List or not.
     /// These values are then used to customise the properties of the code_builders class definition
     /// methods and final output.
     /// We also use this loop to define the imports, classConstructorOptionalParameters and classFields
     for (var gqlField in gqlType.fields) {
-      /// /////////////////////////////////////////////////////////
       /// Pre-process type information
-      /// /////////////////////////////////////////////////////////
       ValidatedFieldType validatedFieldType = ValidatedFieldType.parseGqlField(gqlField);
 
-      /// /////////////////////////////////////////////////////////
       /// Add import directives
-      /// /////////////////////////////////////////////////////////
       // Set the import directives for the class field types that require imports.
       // i.e. import 'package:your_app_package/data/models/author.dart';
       if (!validatedFieldType.isDartType) {
-        classImportDirectives.add(Utils.getTypeImportPathDirective(validatedFieldType.fieldType, packageName, packagePath));
+        classImportDirectives
+            .add(Utils.getTypeImportPathDirective(validatedFieldType.fieldType, packageName, packagePath));
       }
       if (validatedFieldType.isColorType) {
         classImportDirectives.add(Directive.import(colourTypeImportDirective));
       }
 
-      /// /////////////////////////////////////////////////////////
       /// set the class constructor parameters.
       /// i.e. {required this.name,}
-      /// /////////////////////////////////////////////////////////
       classConstructorOptionalParameters.add(Parameter((p) => p
         ..name = validatedFieldType.name
         ..required = true
         ..toThis = true
         ..named = true));
 
-      /// /////////////////////////////////////////////////////////
       /// set the class fields
       /// ie. final String name;
-      /// /////////////////////////////////////////////////////////
       classFields.add(Field((f) => f
         ..name = validatedFieldType.name
         ..modifier = FieldModifier.final$
@@ -165,17 +166,14 @@ class BasicClassWriter {
             ? Reference("List<${validatedFieldType.fieldType}>")
             : Reference(validatedFieldType.fieldType)));
 
-      /// /////////////////////////////////////////////////////////
       /// Store validatedFields for use in generating child methods.
-      /// /////////////////////////////////////////////////////////
       validatedFields.add(validatedFieldType);
     }
 
-    /// /////////////////////////////////////////////////////////
     /// Build Class constructor and Factory methods.
-    /// i.e. +ImageModel()
-    /// +fromJson()
-    /// /////////////////////////////////////////////////////////
+    /// * i.e. +ImageModel()
+    /// * +fromJson()
+    ///
     ListBuilder<Constructor> classConstructors = ListBuilder<Constructor>();
     Constructor classConstructor = Constructor(
       (c) => c..optionalParameters = classConstructorOptionalParameters,
@@ -184,17 +182,15 @@ class BasicClassWriter {
     classConstructors.add(classConstructor);
     classConstructors.add(fromJsonConstructor);
 
-    /// /////////////////////////////////////////////////////////
     /// create the various class methods.
-    /// +toJson()
-    /// +copyWith()
-    /// /////////////////////////////////////////////////////////
+    /// * +toJson()
+    /// * +copyWith()
+    ///
     Method toJsonMethod = generateToJsonMethod(validatedFields);
     Method copyWithMethod = generateCopyWithMethod(className, validatedFields);
 
-    /// /////////////////////////////////////////////////////////
     /// Finally create the Model Class for the graphql type.
-    /// /////////////////////////////////////////////////////////
+    ///
     Class typeClass = Class((b) => b
       ..name = className
       ..constructors = classConstructors
@@ -202,9 +198,8 @@ class BasicClassWriter {
       ..methods.add(toJsonMethod)
       ..methods.add(copyWithMethod));
 
-    /// /////////////////////////////////////////////////////////
-    /// Format and write the class to string.
-    /// /////////////////////////////////////////////////////////
+    /// Format and write the class to string using DartFormatter
+    /// 
     /// Ensuring to wrap in a code_builder Library() to support imports
     final emitter = DartEmitter(
       allocator: Allocator(),
@@ -217,11 +212,11 @@ class BasicClassWriter {
 
     return DartFormatter().format('${library.accept(emitter)}');
   }
-
-  /// /////////////////////////////////////////////////////////
-  /// create fromJson Constructor factory method.
-  /// /////////////////////////////////////////////////////////
-  /// graphql
+  
+  /// Create fromJson Constructor factory method.
+  ///
+  /// Graphql example
+  /// ```graphql
   /// type ImageModel{
   ///     name: String!,
   ///     author: Author!,
@@ -230,8 +225,10 @@ class BasicClassWriter {
   ///     tags: [String]!,
   ///     altText: String!,
   /// }
+  /// ```
   ///
   /// Method
+  /// ```dart
   ///   factory ImageModel.fromJson(Map<String, dynamic> json) {
   ///     List<String> newTags = [];
   ///     final jsonTags = List<dynamic>.from(json['tags']).toList();
@@ -250,6 +247,7 @@ class BasicClassWriter {
   ///       altText: json['altText'],
   ///     );
   ///   }
+  /// ```
   Constructor generateFromJsonConstructor(String className, List<ValidatedFieldType> validatedFields) {
     // fromJson Factory method code
     StringBuffer sb = StringBuffer();
@@ -300,10 +298,10 @@ class BasicClassWriter {
     return fromJsonConstructor;
   }
 
-  /// /////////////////////////////////////////////////////////
   /// Generate the toJson method.
-  /// /////////////////////////////////////////////////////////
-  /// graphql
+  ///
+  /// Graphql example
+  /// ```graphql
   /// type ImageModel{
   ///     name: String!,
   ///     author: Author!,
@@ -312,7 +310,10 @@ class BasicClassWriter {
   ///     tags: [String]!,
   ///     altText: String!,
   /// }
-  /// class method
+  /// ```
+  ///
+  /// Class toJson() method
+  /// ```dart
   ///   Map<String, dynamic> toJson() => {
   ///         "name": name,
   ///         "author": author.toJson(),
@@ -321,6 +322,7 @@ class BasicClassWriter {
   ///         "heroImage": heroImage.toJson(),
   ///         "images": images.map((item) => item.toJson()).toList(),
   ///       };
+  /// ```
   Method generateToJsonMethod(List<ValidatedFieldType> validatedFields) {
     StringBuffer sb = StringBuffer();
     sb.writeln("{");
@@ -354,10 +356,10 @@ class BasicClassWriter {
     return toJsonMethod;
   }
 
-  /// /////////////////////////////////////////////////////////
   /// Generates copyWithMethod()
-  /// /////////////////////////////////////////////////////////
-  /// graphql
+  ///
+  /// Graphql example
+  /// ```graphql
   /// type ImageModel{
   ///     name: String!,
   ///     author: Author!,
@@ -366,8 +368,10 @@ class BasicClassWriter {
   ///     tags: [String]!,
   ///     altText: String!,
   /// }
+  /// ```
   ///
   /// class method
+  /// ```dart
   /// ImageCollection copyWith({
   ///   String? name,
   ///   Author? author,
@@ -385,6 +389,7 @@ class BasicClassWriter {
   ///     images: images ?? this.images,
   ///   );
   /// }
+  /// ```
   Method generateCopyWithMethod(String className, List<ValidatedFieldType> validatedFields) {
     ListBuilder<Parameter> methodParameters = ListBuilder<Parameter>();
 

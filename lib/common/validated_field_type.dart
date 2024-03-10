@@ -27,9 +27,9 @@ class ValidatedFieldType {
     String fieldName = gqlField.name.value;
     // print("Parsing field type: ${fieldName}");
 
-    /// /////////////////////////////////////////////////////////
+    ///
     /// Validate field name for flutter
-    /// /////////////////////////////////////////////////////////
+    ///
     /// Convert graphql field names with double underscore to a valid flutter field name.
     /// Edit ValidatedFieldType.doubleUnderscoreReplacement static member (default mt)
     /// __SomeFieldName -> mtSomeFieldName
@@ -40,9 +40,9 @@ class ValidatedFieldType {
       // print("  converted invalid field name to : $fieldName");
     }
 
-    /// /////////////////////////////////////////////////////////
+    ///
     /// Determine fieldType
-    /// /////////////////////////////////////////////////////////
+    ///
     if (gqlField.type is NamedTypeNode) {
       fieldType = (gqlField.type as NamedTypeNode).name.value;
     } else if (gqlField.type is ListTypeNode) {
@@ -55,17 +55,17 @@ class ValidatedFieldType {
     // Ensure base types are valid Dart types.
     fieldType = Utils.gqlTypeToDartType(fieldType);
 
-    /// /////////////////////////////////////////////////////////
+    ///
     /// Check for specific edge cases such as if type requires
     /// specific import directives.
-    /// /////////////////////////////////////////////////////////
+    ///
     if (fieldType.toLowerCase() == "color") {
       isColorType = true;
     }
 
-    /// /////////////////////////////////////////////////////////
+    ///
     /// done
-    /// /////////////////////////////////////////////////////////
+    ///
     return ValidatedFieldType(
         name: fieldName,
         fieldType: fieldType,

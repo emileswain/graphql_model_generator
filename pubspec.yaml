@@ -1,6 +1,6 @@
 name: graphql_model_generator
 description: "Generates nice-ish looking dart model classes from graphql"
-version: 0.0.1
+version: 0.0.2
 homepage: https://github.com/emileswain/graphql_model_generator
 
 environment:
