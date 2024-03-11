@@ -1,3 +1,7 @@
+## 0.1.0
+
+* Fixed multiple import errors.
+
 ## 0.0.3
 
 * Various formatting updates as per pana feedback.
