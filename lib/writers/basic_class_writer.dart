@@ -150,14 +150,16 @@ class BasicClassWriter {
         // classImportDirectives
         //     .add(Utils.getTypeImportPathDirective(validatedFieldType.fieldType, packageName, packagePath));
         var import = Utils.getTypeImportPathDirective(validatedFieldType.fieldType, packageName, packagePath);
-        var found = classImportDirectives.firstWhere((element) => element.url == import.url, orElse: ()=> Directive.import("NotFound") );
+        var found = classImportDirectives.firstWhere((element) => element.url == import.url,
+            orElse: () => Directive.import("NotFound"));
         if (found.url == "NotFound") {
           classImportDirectives.add(import);
         }
       }
       if (validatedFieldType.isColorType) {
         var import = Directive.import(colourTypeImportDirective);
-        var found = classImportDirectives.firstWhere((element) => element.url == import.url, orElse: ()=> Directive.import("NotFound") );
+        var found = classImportDirectives.firstWhere((element) => element.url == import.url,
+            orElse: () => Directive.import("NotFound"));
         if (found.url == "NotFound") {
           classImportDirectives.add(import);
         }
@@ -165,7 +167,8 @@ class BasicClassWriter {
 
       /// set the class constructor parameters.
       /// i.e. {required this.name,}
-      classConstructorOptionalParameters.add(Parameter((p) => p
+      classConstructorOptionalParameters.add(Parameter((p) =>
+      p
         ..name = validatedFieldType.name
         ..required = true
         ..toThis = true
@@ -173,7 +176,8 @@ class BasicClassWriter {
 
       /// set the class fields
       /// ie. final String name;
-      classFields.add(Field((f) => f
+      classFields.add(Field((f) =>
+      f
         ..name = validatedFieldType.name
         ..modifier = FieldModifier.final$
         ..type = validatedFieldType.isList
@@ -205,7 +209,8 @@ class BasicClassWriter {
 
     /// Finally create the Model Class for the graphql type.
     ///
-    Class typeClass = Class((b) => b
+    Class typeClass = Class((b) =>
+    b
       ..name = className
       ..constructors = classConstructors
       ..fields = classFields
@@ -223,7 +228,8 @@ class BasicClassWriter {
     var directives = ListBuilder<Directive>();
     directives.addAll(classImportDirectives);
 
-    final library = Library((l) => l
+    final library = Library((l) =>
+    l
       ..body.add(typeClass)
       ..directives = directives);
 
@@ -281,14 +287,22 @@ class BasicClassWriter {
         sb.writeln("final json$capped = List<dynamic>.from(json['${validatedFieldType.name}']).toList();");
 
         sb.writeln("for (var itemData in json$capped) {");
+
+        sb.writeln("try {"); // Open Try
+
         if (!validatedFieldType.isDartType) {
           sb.writeln("final item = ${validatedFieldType.fieldType}.fromJson(itemData);");
         } else {
           sb.writeln("final item = itemData;");
         }
-        sb.writeln("if (item != null) {");
+
+        //sb.writeln("if (item != null) {");
         sb.writeln(" new$capped.add(item);");
-        sb.writeln("}");
+        //sb.writeln("}");// end if
+        sb.writeln("}catch(e){");
+        sb.writeln("// fix"); // end catch
+        sb.writeln("}"); // end catch
+
         sb.writeln("}");
       }
     }
@@ -305,11 +319,13 @@ class BasicClassWriter {
     }
     sb.write(");");
 
-    Constructor fromJsonConstructor = Constructor((c) => c
+    Constructor fromJsonConstructor = Constructor((c) =>
+    c
       ..name = "fromJson"
       ..factory = true
       ..requiredParameters = ListBuilder({
-        Parameter((p) => p
+        Parameter((p) =>
+        p
           ..name = 'json'
           ..type = const Reference("Map<String, dynamic>"))
       })
@@ -371,7 +387,8 @@ class BasicClassWriter {
     sb.writeln("}");
 
     // toJson Method
-    Method toJsonMethod = Method((m) => m
+    Method toJsonMethod = Method((m) =>
+    m
       ..name = "toJson"
       ..lambda = true
       ..returns = const Reference("Map<String, dynamic>")
@@ -430,7 +447,8 @@ class BasicClassWriter {
         fieldType = "List<$fieldType>";
       }
       // Save an additional loop, also do parameters
-      methodParameters.add(Parameter((p) => p
+      methodParameters.add(Parameter((p) =>
+      p
         ..name = validatedFieldType.name
         ..type = Reference("$fieldType?")
         ..required = false
@@ -440,7 +458,8 @@ class BasicClassWriter {
     sb.writeln(");");
 
     // toJson Method
-    Method copyWithMethod = Method((m) => m
+    Method copyWithMethod = Method((m) =>
+    m
       ..name = "copyWith"
       ..lambda = false
       ..optionalParameters = methodParameters
