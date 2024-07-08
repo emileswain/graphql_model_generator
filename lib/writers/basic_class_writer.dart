@@ -4,7 +4,7 @@ import 'package:dart_style/dart_style.dart';
 import 'package:gql/ast.dart';
 import 'package:graphql_model_generator/common/utils.dart';
 import 'package:graphql_model_generator/common/validated_field_type.dart';
-import 'dart:developer' as developer;
+
 /// Generates custom dart class given the graphQL type data.
 ///
 /// Implements a super basic typical flutter type model class.
