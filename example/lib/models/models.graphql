@@ -1,5 +1,7 @@
 type Author {
     name: String!,
+    date: Date!,
+    dates: [Date]!,
 }
 
 type ImageModel{

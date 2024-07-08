@@ -4,7 +4,7 @@ import 'package:dart_style/dart_style.dart';
 import 'package:gql/ast.dart';
 import 'package:graphql_model_generator/common/utils.dart';
 import 'package:graphql_model_generator/common/validated_field_type.dart';
-
+import 'dart:developer' as developer;
 /// Generates custom dart class given the graphQL type data.
 ///
 /// Implements a super basic typical flutter type model class.
@@ -101,6 +101,9 @@ class BasicClassWriter {
   /// import for supporting Color type.
   static String colourTypeImportDirective = 'package:flutter/material.dart';
 
+  /// import for support DateTime type.
+  static String dateTimeTypeImportDirective = 'package:flutter/material.dart';
+
   /// graphql data received from ast
   ObjectTypeDefinitionNode gqlType;
 
@@ -146,9 +149,8 @@ class BasicClassWriter {
       /// Add import directives
       // Set the import directives for the class field types that require imports.
       // i.e. import 'package:your_app_package/data/models/author.dart';
+      // These are essentially other classes defined in your graphql.
       if (!validatedFieldType.isDartType) {
-        // classImportDirectives
-        //     .add(Utils.getTypeImportPathDirective(validatedFieldType.fieldType, packageName, packagePath));
         var import = Utils.getTypeImportPathDirective(validatedFieldType.fieldType, packageName, packagePath);
         var found = classImportDirectives.firstWhere((element) => element.url == import.url,
             orElse: () => Directive.import("NotFound"));
@@ -156,6 +158,7 @@ class BasicClassWriter {
           classImportDirectives.add(import);
         }
       }
+      // Edge case imports. Not covered by standard dart types or your graphql types.
       if (validatedFieldType.isColorType) {
         var import = Directive.import(colourTypeImportDirective);
         var found = classImportDirectives.firstWhere((element) => element.url == import.url,
@@ -167,8 +170,7 @@ class BasicClassWriter {
 
       /// set the class constructor parameters.
       /// i.e. {required this.name,}
-      classConstructorOptionalParameters.add(Parameter((p) =>
-      p
+      classConstructorOptionalParameters.add(Parameter((p) => p
         ..name = validatedFieldType.name
         ..required = true
         ..toThis = true
@@ -176,8 +178,7 @@ class BasicClassWriter {
 
       /// set the class fields
       /// ie. final String name;
-      classFields.add(Field((f) =>
-      f
+      classFields.add(Field((f) => f
         ..name = validatedFieldType.name
         ..modifier = FieldModifier.final$
         ..type = validatedFieldType.isList
@@ -194,7 +195,9 @@ class BasicClassWriter {
     ///
     ListBuilder<Constructor> classConstructors = ListBuilder<Constructor>();
     Constructor classConstructor = Constructor(
-          (c) => c..optionalParameters = classConstructorOptionalParameters,
+      (c) => c
+        ..optionalParameters = classConstructorOptionalParameters
+        ..constant = true,
     );
     Constructor fromJsonConstructor = generateFromJsonConstructor(className, validatedFields);
     classConstructors.add(classConstructor);
@@ -209,8 +212,7 @@ class BasicClassWriter {
 
     /// Finally create the Model Class for the graphql type.
     ///
-    Class typeClass = Class((b) =>
-    b
+    Class typeClass = Class((b) => b
       ..name = className
       ..constructors = classConstructors
       ..fields = classFields
@@ -228,8 +230,7 @@ class BasicClassWriter {
     var directives = ListBuilder<Directive>();
     directives.addAll(classImportDirectives);
 
-    final library = Library((l) =>
-    l
+    final library = Library((l) => l
       ..body.add(typeClass)
       ..directives = directives);
 
@@ -293,7 +294,11 @@ class BasicClassWriter {
         if (!validatedFieldType.isDartType) {
           sb.writeln("final item = ${validatedFieldType.fieldType}.fromJson(itemData);");
         } else {
-          sb.writeln("final item = itemData;");
+          if (validatedFieldType.fieldType == "DateTime") {
+            sb.writeln("final item = DateTime.parse(itemData);");
+          } else {
+            sb.writeln("final item = itemData;");
+          }
         }
 
         //sb.writeln("if (item != null) {");
@@ -314,22 +319,24 @@ class BasicClassWriter {
         var capped = Utils.capitalise(validatedFieldType.name);
         sb.write(" ${validatedFieldType.name}: new$capped ,");
       } else {
-        sb.write(" ${validatedFieldType.name}: json['${validatedFieldType.name}'] ,");
+        if (validatedFieldType.fieldType == "DateTime") {
+          sb.write(" ${validatedFieldType.name}: DateTime.parse(json['${validatedFieldType.name}']) ,");
+        } else {
+          sb.write(" ${validatedFieldType.name}: json['${validatedFieldType.name}'] ,");
+        }
       }
     }
     sb.write(");");
 
-    Constructor fromJsonConstructor = Constructor((c) =>
-    c
+    Constructor fromJsonConstructor = Constructor((c) => c
       ..name = "fromJson"
       ..factory = true
       ..requiredParameters = ListBuilder({
-        Parameter((p) =>
-        p
+        Parameter((p) => p
           ..name = 'json'
           ..type = const Reference("Map<String, dynamic>"))
       })
-    // ..body = const Code("return ImageModel(name: json['name'],title: json['title'],url: json['url'],);"));
+      // ..body = const Code("return ImageModel(name: json['name'],title: json['title'],url: json['url'],);"));
       ..body = Code(sb.toString()));
 
     return fromJsonConstructor;
@@ -370,14 +377,24 @@ class BasicClassWriter {
       // working with none lists.
       if (!validatedFieldType.isList) {
         if (validatedFieldType.isDartType) {
-          sb.writeln('"${validatedFieldType.name}" : ${validatedFieldType.name},');
+          // manage some edge cases, should refactor to not suck.
+          if (validatedFieldType.fieldType == "DateTime") {
+            sb.writeln('"${validatedFieldType.name}" : ${validatedFieldType.name}.toIso8601String(),');
+          } else {
+            sb.writeln('"${validatedFieldType.name}" : ${validatedFieldType.name},');
+          }
         } else {
           sb.writeln('"${validatedFieldType.name}" : ${validatedFieldType.name}.toJson(),');
         }
       } else {
         // working with Lists
         if (validatedFieldType.isDartType) {
-          sb.writeln('"${validatedFieldType.name}" : ${validatedFieldType.name}.map((item) => item).toList(),');
+          if (validatedFieldType.fieldType == "DateTime") {
+            sb.writeln(
+                '"${validatedFieldType.name}" : ${validatedFieldType.name}.map((item) => item.toIso8601String()).toList(),');
+          } else {
+            sb.writeln('"${validatedFieldType.name}" : ${validatedFieldType.name}.map((item) => item).toList(),');
+          }
         } else {
           sb.writeln(
               '"${validatedFieldType.name}" : ${validatedFieldType.name}.map((item) => item.toJson()).toList(),');
@@ -387,8 +404,7 @@ class BasicClassWriter {
     sb.writeln("}");
 
     // toJson Method
-    Method toJsonMethod = Method((m) =>
-    m
+    Method toJsonMethod = Method((m) => m
       ..name = "toJson"
       ..lambda = true
       ..returns = const Reference("Map<String, dynamic>")
@@ -447,8 +463,7 @@ class BasicClassWriter {
         fieldType = "List<$fieldType>";
       }
       // Save an additional loop, also do parameters
-      methodParameters.add(Parameter((p) =>
-      p
+      methodParameters.add(Parameter((p) => p
         ..name = validatedFieldType.name
         ..type = Reference("$fieldType?")
         ..required = false
@@ -458,8 +473,7 @@ class BasicClassWriter {
     sb.writeln(");");
 
     // toJson Method
-    Method copyWithMethod = Method((m) =>
-    m
+    Method copyWithMethod = Method((m) => m
       ..name = "copyWith"
       ..lambda = false
       ..optionalParameters = methodParameters

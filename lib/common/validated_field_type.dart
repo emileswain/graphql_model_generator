@@ -32,6 +32,7 @@ class ValidatedFieldType {
   /// Whether the field is specifically a Color type.
   final bool isColorType;
 
+
   /// A representation of the graphql field. Used to later write specific code output.
   ValidatedFieldType(
       {required this.name,
@@ -45,6 +46,7 @@ class ValidatedFieldType {
     String fieldType;
     bool isList = false;
     bool isColorType = false;
+
     String fieldName = gqlField.name.value;
     // print("Parsing field type: ${fieldName}");
 
@@ -65,8 +67,7 @@ class ValidatedFieldType {
     if (gqlField.type is NamedTypeNode) {
       fieldType = (gqlField.type as NamedTypeNode).name.value;
     } else if (gqlField.type is ListTypeNode) {
-      fieldType =
-          ((gqlField.type as ListTypeNode).type as NamedTypeNode).name.value;
+      fieldType = ((gqlField.type as ListTypeNode).type as NamedTypeNode).name.value;
       isList = true;
     } else {
       throw Exception(
@@ -85,10 +86,11 @@ class ValidatedFieldType {
 
     /// done
     return ValidatedFieldType(
-        name: fieldName,
-        fieldType: fieldType,
-        isList: isList,
-        isDartType: Utils.isDartType(fieldType),
-        isColorType: isColorType);
+      name: fieldName,
+      fieldType: fieldType,
+      isList: isList,
+      isDartType: Utils.isDartType(fieldType),
+      isColorType: isColorType,
+    );
   }
 }

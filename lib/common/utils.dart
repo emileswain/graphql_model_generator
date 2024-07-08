@@ -13,7 +13,7 @@ class Utils {
   /// @returns Whether type is a dart type or not.
   static bool isDartType(String type) {
     try {
-      return ["String", "int", "double", "bool", "Color"].contains(type);
+      return ["String", "int", "double", "bool", "Color", "DateTime"].contains(type);
     } catch (_) {
       return false;
     }
@@ -84,6 +84,8 @@ class Utils {
   /// @param type Graphql Type to convert to Dart Type.
   static String gqlTypeToDartType(String type) {
     switch (type) {
+      case "Date":
+        return "DateTime";
       case "Int":
         return "int";
       case "Float":
