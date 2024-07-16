@@ -172,7 +172,7 @@ class BasicClassWriter {
       /// i.e. {required this.name,}
       classConstructorOptionalParameters.add(Parameter((p) => p
         ..name = validatedFieldType.name
-        ..required = true
+        ..required = !validatedFieldType.nullable
         ..toThis = true
         ..named = true));
 
@@ -180,10 +180,12 @@ class BasicClassWriter {
       /// ie. final String name;
       classFields.add(Field((f) => f
         ..name = validatedFieldType.name
-        ..modifier = FieldModifier.final$
+        ..modifier = !validatedFieldType.nullable ? FieldModifier.final$ : FieldModifier.var$
         ..type = validatedFieldType.isList
             ? Reference("List<${validatedFieldType.fieldType}>")
-            : Reference(validatedFieldType.fieldType)));
+            : Reference("${validatedFieldType.fieldType}${validatedFieldType.nullable ? "?" :""}")));
+
+      // : Reference("${!validatedFieldType.nullable ? "?" :""}${validatedFieldType.fieldType}")));
 
       /// Store validatedFields for use in generating child methods.
       validatedFields.add(validatedFieldType);
@@ -214,8 +216,8 @@ class BasicClassWriter {
     ///
     Class typeClass = Class((b) => b
       ..name = className
-      ..constructors = classConstructors
       ..fields = classFields
+      ..constructors = classConstructors
       ..methods.add(toJsonMethod)
       ..methods.add(copyWithMethod));
 
@@ -321,6 +323,9 @@ class BasicClassWriter {
       } else {
         if (validatedFieldType.fieldType == "DateTime") {
           sb.write(" ${validatedFieldType.name}: DateTime.parse(json['${validatedFieldType.name}']) ,");
+        }else if (!validatedFieldType.isDartType)
+        {
+            sb.write(" ${validatedFieldType.name}: ${validatedFieldType.fieldType}.fromJson(json['${validatedFieldType.name}']),");
         } else {
           sb.write(" ${validatedFieldType.name}: json['${validatedFieldType.name}'] ,");
         }

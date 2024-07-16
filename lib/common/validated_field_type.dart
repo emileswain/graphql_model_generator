@@ -32,6 +32,8 @@ class ValidatedFieldType {
   /// Whether the field is specifically a Color type.
   final bool isColorType;
 
+  /// Determines if the field can be nullable or not
+  final bool nullable;
 
   /// A representation of the graphql field. Used to later write specific code output.
   ValidatedFieldType(
@@ -39,7 +41,8 @@ class ValidatedFieldType {
       required this.fieldType,
       required this.isList,
       required this.isDartType,
-      required this.isColorType});
+      required this.isColorType,
+      required this.nullable});
 
   /// Parse the details of a specific graphql type field definition returning an instance of [ValidatedFieldType]
   factory ValidatedFieldType.parseGqlField(FieldDefinitionNode gqlField) {
@@ -86,11 +89,11 @@ class ValidatedFieldType {
 
     /// done
     return ValidatedFieldType(
-      name: fieldName,
-      fieldType: fieldType,
-      isList: isList,
-      isDartType: Utils.isDartType(fieldType),
-      isColorType: isColorType,
-    );
+        name: fieldName,
+        fieldType: fieldType,
+        isList: isList,
+        isDartType: Utils.isDartType(fieldType),
+        isColorType: isColorType,
+        nullable: !gqlField.type.isNonNull);
   }
 }
