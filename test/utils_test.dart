@@ -1,7 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gql/ast.dart';
+import 'package:graphql_model_generator/builders/gql_to_model_builder.dart';
 
 import 'package:graphql_model_generator/common/utils.dart';
-
+import "package:gql/language.dart" as lang;
+import 'package:graphql_model_generator/writers/basic_class_writer.dart';
 void main() {
   test('utils.capitalise() capitalises.', () {
     String source = "lowerCased";
@@ -59,5 +63,48 @@ void main() {
     expect(Utils.isDartType('MyClass'), false);
     expect(Utils.isDartType('SomeOtherClass'), false);
     expect(Utils.isDartType('ool'), false);
+  });
+
+  var graphqlString = '''
+"""
+something before
+@const
+"""
+type Author {
+    name: String!,
+    date: Date!,
+}
+  ''';
+
+  test('parse file. ', () {
+
+    var packageName = "test.package";
+    var importPath = "";
+
+    final DocumentNode doc = lang.parseString(graphqlString);
+    final TypeVisitor v = TypeVisitor();
+    doc.accept(v);
+    // ListBuilder<Directive> classImportDirectives = ListBuilder<Directive>();
+
+    for (var gqlType in v.types) {
+      try {
+        // String typeName = gqlType.name.value;
+        // Generate and write class to disk
+        BasicClassWriter interpreter =
+        BasicClassWriter(gqlType, packageName, importPath);
+        String classBody = interpreter.writeClassFromGQLType();
+        // writeToFile(buildStep, typeName, classBody);
+        if (kDebugMode) {
+          print (classBody);
+        }
+
+        // generate import directive for builder output class.
+        // classImportDirectives.add(Utils.getTypeExportPathDirective(
+        //     typeName, packageName, importPath));
+      } catch (err) {
+        // developer.log(err.toString());
+      }
+    }
+
   });
 }

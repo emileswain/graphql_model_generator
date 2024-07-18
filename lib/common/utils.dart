@@ -7,6 +7,7 @@ import 'package:code_builder/code_builder.dart';
 /// to the various fields and internal vars defined in the
 /// outputted code.
 class Utils {
+
   /// Convert between graphql schema types and dart types.
   ///
   /// @param type Type as string to test.

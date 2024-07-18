@@ -1,9 +1,12 @@
+# not parsed.
 type Author {
     name: String!,
     date: Date!,
     dates: [Date]!,
 }
-
+"""
+Something
+"""
 type ImageModel{
     name: String!,
     author: Author!,
@@ -13,6 +16,10 @@ type ImageModel{
     altText: String!,
 }
 
+"""
+Something
+@const
+"""
 type ImageCollection{
     name: String!,
     author: Author!,

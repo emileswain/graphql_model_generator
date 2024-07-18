@@ -2,6 +2,7 @@ import 'package:built_collection/built_collection.dart';
 import 'package:code_builder/code_builder.dart';
 import 'package:dart_style/dart_style.dart';
 import 'package:gql/ast.dart';
+import 'package:graphql_model_generator/common/comment_attribute.dart';
 import 'package:graphql_model_generator/common/utils.dart';
 import 'package:graphql_model_generator/common/validated_field_type.dart';
 
@@ -191,15 +192,18 @@ class BasicClassWriter {
       validatedFields.add(validatedFieldType);
     }
 
+
     /// Build Class constructor and Factory methods.
     /// * i.e. +ImageModel()
     /// * +fromJson()
     ///
+    Modifiers modifiers = Modifiers(gqlType.description?.value ?? "");
+
     ListBuilder<Constructor> classConstructors = ListBuilder<Constructor>();
     Constructor classConstructor = Constructor(
       (c) => c
         ..optionalParameters = classConstructorOptionalParameters
-        ..constant = true,
+        ..constant = modifiers.hasModifier(ModificationType.constClass),
     );
     Constructor fromJsonConstructor = generateFromJsonConstructor(className, validatedFields);
     classConstructors.add(classConstructor);
