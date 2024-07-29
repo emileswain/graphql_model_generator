@@ -1,4 +1,5 @@
 import 'package:gql/ast.dart';
+import 'package:graphql_model_generator/common/comment_attribute.dart';
 import 'package:graphql_model_generator/common/utils.dart';
 
 /// A class that determines and returns various facts derived from a graphql's child field.
@@ -35,6 +36,9 @@ class ValidatedFieldType {
   /// Determines if the field can be nullable or not
   final bool nullable;
 
+  /// Default value for field.
+  final String defaultValue;
+
   /// A representation of the graphql field. Used to later write specific code output.
   ValidatedFieldType(
       {required this.name,
@@ -42,16 +46,25 @@ class ValidatedFieldType {
       required this.isList,
       required this.isDartType,
       required this.isColorType,
-      required this.nullable});
+      required this.nullable,
+      required this.defaultValue});
 
   /// Parse the details of a specific graphql type field definition returning an instance of [ValidatedFieldType]
   factory ValidatedFieldType.parseGqlField(FieldDefinitionNode gqlField) {
     String fieldType;
     bool isList = false;
     bool isColorType = false;
+    String defaultValue = "";
 
     String fieldName = gqlField.name.value;
     // print("Parsing field type: ${fieldName}");
+
+    /// Parse field behaviours
+    Modifiers modifiers = Modifiers(gqlField.description?.value ?? "");
+    if (modifiers.hasModifier(ModificationType.defaultValue)) {
+      Modifier defaultModifier = modifiers.getModifier(ModificationType.defaultValue);
+      defaultValue = defaultModifier.value;
+    }
 
     /// Validate field name for flutter
     ///
@@ -94,6 +107,7 @@ class ValidatedFieldType {
         isList: isList,
         isDartType: Utils.isDartType(fieldType),
         isColorType: isColorType,
-        nullable: !gqlField.type.isNonNull);
+        nullable: !gqlField.type.isNonNull,
+        defaultValue: defaultValue);
   }
 }

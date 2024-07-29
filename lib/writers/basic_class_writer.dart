@@ -321,17 +321,18 @@ class BasicClassWriter {
     // Write Return statement.
     sb.write("return $className(");
     for (var validatedFieldType in validatedFields) {
+      var dV = validatedFieldType.defaultValue != "" ? "?? ${validatedFieldType.defaultValue}" : "";
       if (validatedFieldType.isList) {
         var capped = Utils.capitalise(validatedFieldType.name);
         sb.write(" ${validatedFieldType.name}: new$capped ,");
       } else {
         if (validatedFieldType.fieldType == "DateTime") {
-          sb.write(" ${validatedFieldType.name}: DateTime.parse(json['${validatedFieldType.name}']) ,");
+          sb.write(" ${validatedFieldType.name}: DateTime.parse(json['${validatedFieldType.name}'] $dV) ,");
         }else if (!validatedFieldType.isDartType)
         {
             sb.write(" ${validatedFieldType.name}: ${validatedFieldType.fieldType}.fromJson(json['${validatedFieldType.name}']),");
         } else {
-          sb.write(" ${validatedFieldType.name}: json['${validatedFieldType.name}'] ,");
+          sb.write(" ${validatedFieldType.name}: json['${validatedFieldType.name}'] $dV ,");
         }
       }
     }

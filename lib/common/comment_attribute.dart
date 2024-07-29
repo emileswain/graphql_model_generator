@@ -71,6 +71,10 @@ class Modifier {
   static Modifier parseComment(String comment) {
     if (comment.startsWith("@const")) {
       return Modifier(type: ModificationType.constClass, comment: comment);
+    } else if (comment.startsWith("@DefaultValue")) {
+      var v = "test";
+      v = comment.substring(comment.indexOf("(")+1, comment.lastIndexOf(")"));
+      return Modifier(type: ModificationType.defaultValue, comment: comment, value: v);
     } else {
       throw Exception("invalid Directive comment");
     }

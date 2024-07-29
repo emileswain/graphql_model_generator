@@ -72,7 +72,20 @@ something before
 """
 type Author {
     name: String!,
+    """
+    @DefaultValue("12/4/2000")
+    """
     date: Date!,
+    
+    """
+    @DefaultValue(false)
+    """
+    isTrue: bool!,
+    
+    """
+    @DefaultValue ("a string")
+    """
+    defaultString : String!,
 }
   ''';
 
